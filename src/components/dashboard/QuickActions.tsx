@@ -15,7 +15,7 @@ export function QuickActions() {
 }
 
 function ActionBtn({ icon: Icon, label, variant = "default", onClick, disabled }: {
-  icon: React.ComponentType<{ size: number }>;
+  icon: React.ComponentType<{ size?: number | string }>;
   label: string;
   variant?: "primary" | "destructive" | "default";
   onClick?: () => void;
