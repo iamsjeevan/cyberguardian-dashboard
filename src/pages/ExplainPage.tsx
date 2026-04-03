@@ -1,5 +1,5 @@
 import { Panel } from "@/components/dashboard/Panel";
-import { mockExplanations } from "@/lib/mock-data";
+import { useExplainHistory, useGenerateExplanation } from "@/hooks/useApiData";
 import { motion } from "framer-motion";
 
 const sevStyle: Record<string, string> = {
@@ -10,17 +10,23 @@ const sevStyle: Record<string, string> = {
 };
 
 export default function ExplainPage() {
+  const { data: explanations } = useExplainHistory();
+  const generateMutation = useGenerateExplanation();
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-sm text-muted-foreground tracking-widest uppercase">XAI Action Explanations</h2>
-        <button className="px-3 py-1.5 rounded border border-primary/30 bg-primary/20 text-primary font-mono text-xs uppercase">
+        <button
+          onClick={() => generateMutation.mutate({ action: "Monitor", step: 0, threat: "Unknown", obs_decoded: "Current state", risk_score: 0.5 })}
+          className="px-3 py-1.5 rounded border border-primary/30 bg-primary/20 text-primary font-mono text-xs uppercase"
+        >
           Generate Explanation
         </button>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {mockExplanations.map((card, i) => (
+        {(explanations ?? []).map((card, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 16 }}

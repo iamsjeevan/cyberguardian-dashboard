@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { useAppStore } from "@/stores/appStore";
-import type { Host } from "@/lib/api/client";
+import { useNetworkTopology } from "@/hooks/useApiData";
 
 const statusColor: Record<string, string> = {
   CLEAN: "#00ff9d",
@@ -19,10 +18,11 @@ const subnetLinks = [
 
 export function NetworkTopologyPanel() {
   const svgRef = useRef<SVGSVGElement>(null);
-  const hosts = useAppStore((s) => s.hosts);
+  const { data: topology } = useNetworkTopology();
+  const hosts = topology?.hosts ?? [];
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    if (!svgRef.current || hosts.length === 0) return;
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
@@ -42,73 +42,42 @@ export function NetworkTopologyPanel() {
 
     const g = svg.append("g");
 
-    // Edges
     const link = g.append("g")
-      .selectAll("line")
-      .data(links)
-      .join("line")
-      .attr("stroke", "#0d3a5c")
-      .attr("stroke-width", 1.5)
-      .attr("stroke-opacity", 0.6);
+      .selectAll("line").data(links).join("line")
+      .attr("stroke", "#0d3a5c").attr("stroke-width", 1.5).attr("stroke-opacity", 0.6);
 
-    // Nodes
     const node = g.append("g")
-      .selectAll("g")
-      .data(nodes)
-      .join("g")
-      .attr("cursor", "pointer");
+      .selectAll("g").data(nodes).join("g").attr("cursor", "pointer");
 
-    // Node circles
     node.append("circle")
       .attr("r", (d) => d.name === "Op_Server0" ? 18 : 12)
       .attr("fill", (d) => statusColor[d.status] + "30")
       .attr("stroke", (d) => statusColor[d.status])
       .attr("stroke-width", (d) => d.name === "Op_Server0" ? 3 : 1.5);
 
-    // Op_Server0 golden ring
     node.filter((d) => d.name === "Op_Server0")
-      .append("circle")
-      .attr("r", 22)
-      .attr("fill", "none")
-      .attr("stroke", "#ffd700")
-      .attr("stroke-width", 1)
-      .attr("stroke-dasharray", "3,3")
-      .attr("opacity", 0.6);
+      .append("circle").attr("r", 22).attr("fill", "none")
+      .attr("stroke", "#ffd700").attr("stroke-width", 1)
+      .attr("stroke-dasharray", "3,3").attr("opacity", 0.6);
 
-    // Pulse for compromised
     node.filter((d) => d.status === "COMPROMISED")
-      .append("circle")
-      .attr("r", 16)
-      .attr("fill", "none")
-      .attr("stroke", "#ff3366")
-      .attr("stroke-width", 1)
-      .attr("opacity", 0.5)
-      .append("animate")
-      .attr("attributeName", "r")
-      .attr("from", "12")
-      .attr("to", "24")
-      .attr("dur", "1.5s")
-      .attr("repeatCount", "indefinite");
+      .append("circle").attr("r", 16).attr("fill", "none")
+      .attr("stroke", "#ff3366").attr("stroke-width", 1).attr("opacity", 0.5)
+      .append("animate").attr("attributeName", "r")
+      .attr("from", "12").attr("to", "24").attr("dur", "1.5s").attr("repeatCount", "indefinite");
 
-    // Labels
     node.append("text")
       .text((d) => d.name.replace("_", " "))
       .attr("text-anchor", "middle")
       .attr("dy", (d) => d.name === "Op_Server0" ? 32 : 24)
-      .attr("fill", "#7ab3d4")
-      .attr("font-size", "9px")
-      .attr("font-family", "JetBrains Mono");
+      .attr("fill", "#7ab3d4").attr("font-size", "9px").attr("font-family", "JetBrains Mono");
 
-    // Tooltip
     node.append("title")
       .text((d) => `${d.name}\nStatus: ${d.status}\nSubnet: ${d.subnet}\nMalicious: ${d.malicious_processes.length}\nPrivileged: ${d.privileged_sessions.length}`);
 
     sim.on("tick", () => {
-      link
-        .attr("x1", (d: any) => d.source.x)
-        .attr("y1", (d: any) => d.source.y)
-        .attr("x2", (d: any) => d.target.x)
-        .attr("y2", (d: any) => d.target.y);
+      link.attr("x1", (d: any) => d.source.x).attr("y1", (d: any) => d.source.y)
+        .attr("x2", (d: any) => d.target.x).attr("y2", (d: any) => d.target.y);
       node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
     });
 

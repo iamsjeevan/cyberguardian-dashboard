@@ -1,5 +1,6 @@
 import { Panel } from "@/components/dashboard/Panel";
 import { NetworkTopologyPanel } from "@/components/dashboard/NetworkTopologyPanel";
+import { useNetworkTopology } from "@/hooks/useApiData";
 import { useAppStore } from "@/stores/appStore";
 
 const statusStyle: Record<string, string> = {
@@ -11,7 +12,9 @@ const statusStyle: Record<string, string> = {
 };
 
 export default function NetworkPage() {
-  const { hosts, selectedHost, setSelectedHost } = useAppStore();
+  const { selectedHost, setSelectedHost } = useAppStore();
+  const { data: topology } = useNetworkTopology();
+  const hosts = topology?.hosts ?? [];
   const selected = hosts.find(h => h.name === selectedHost);
 
   return (

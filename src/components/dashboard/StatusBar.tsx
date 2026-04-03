@@ -1,9 +1,12 @@
+import { useTrainingStatus, useHealth } from "@/hooks/useApiData";
 import { useAppStore } from "@/stores/appStore";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 export function StatusBar() {
-  const { training, isTraining } = useAppStore();
+  const { isTraining } = useAppStore();
+  const { data: training } = useTrainingStatus();
+  const { data: health } = useHealth();
   const [clock, setClock] = useState(new Date());
   const [uptime, setUptime] = useState(0);
 
@@ -22,6 +25,9 @@ export function StatusBar() {
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
   };
 
+  const step = training?.step ?? 0;
+  const apiOk = !!health && health.status !== "mock";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -8 }}
@@ -33,20 +39,20 @@ export function StatusBar() {
           {clock.toLocaleTimeString("en-GB", { hour12: false })} UTC
         </span>
         <span className="text-muted-foreground">UPTIME: {fmtUptime(uptime)}</span>
-        
+
         <div className={`status-badge ${isTraining ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
           {isTraining ? "● TRAINING" : "○ IDLE"}
         </div>
 
         <div className="flex items-center gap-3 ml-auto">
-          <ConnDot label="API" ok />
+          <ConnDot label="API" ok={apiOk} />
           <ConnDot label="WS" ok={false} />
-          <ConnDot label="Neo4j" ok />
-          <ConnDot label="Redis" ok />
+          <ConnDot label="Neo4j" ok={apiOk} />
+          <ConnDot label="Redis" ok={apiOk} />
         </div>
 
         <span className="text-muted-foreground">
-          EP: {Math.floor(training.step / 100).toLocaleString()} | TS: {training.step.toLocaleString()}
+          EP: {Math.floor(step / 100).toLocaleString()} | TS: {step.toLocaleString()}
         </span>
       </div>
     </motion.div>

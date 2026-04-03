@@ -1,16 +1,21 @@
 import { Panel } from "@/components/dashboard/Panel";
-import { mockTrainingHistory } from "@/lib/mock-data";
+import { useTrainingHistory, useTrainingStatus, useStartTraining, useStopTraining } from "@/hooks/useApiData";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { useAppStore } from "@/stores/appStore";
 import { Play, Square } from "lucide-react";
 
 export default function TrainingPage() {
-  const { isTraining, setIsTraining, training } = useAppStore();
+  const { isTraining, setIsTraining } = useAppStore();
+  const { data: training } = useTrainingStatus();
+  const { data: history } = useTrainingHistory();
+  const startMutation = useStartTraining();
+  const stopMutation = useStopTraining();
+
+  const step = training?.step ?? 0;
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-12 gap-4">
-        {/* Config */}
         <Panel title="Configuration" className="col-span-3" delay={0}>
           <div className="space-y-4 text-xs">
             <SliderField label="Total Timesteps" value="2,000,000" />
@@ -18,11 +23,11 @@ export default function TrainingPage() {
             <SliderField label="λ EWC" value="5000" />
             <SliderField label="N Environments" value="8" />
             <div className="flex gap-2 pt-2">
-              <button onClick={() => setIsTraining(true)} disabled={isTraining}
+              <button onClick={() => { setIsTraining(true); startMutation.mutate(); }} disabled={isTraining}
                 className="flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded bg-primary/20 text-primary border border-primary/30 font-mono uppercase text-[10px] disabled:opacity-30">
                 <Play size={10} /> START
               </button>
-              <button onClick={() => setIsTraining(false)} disabled={!isTraining}
+              <button onClick={() => { setIsTraining(false); stopMutation.mutate(); }} disabled={!isTraining}
                 className="flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded bg-destructive/20 text-destructive border border-destructive/30 font-mono uppercase text-[10px] disabled:opacity-30">
                 <Square size={10} /> STOP
               </button>
@@ -30,10 +35,9 @@ export default function TrainingPage() {
           </div>
         </Panel>
 
-        {/* Main chart */}
         <Panel title="Reward Curve" className="col-span-6" live delay={1} glow>
           <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={mockTrainingHistory}>
+            <LineChart data={history ?? []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#0d3a5c" />
               <XAxis dataKey="step" tickFormatter={(v) => `${(v/1000).toFixed(0)}K`}
                 tick={{ fontSize: 10, fill: "#3d7a9e", fontFamily: "JetBrains Mono" }} stroke="#0d3a5c" />
@@ -46,12 +50,11 @@ export default function TrainingPage() {
           </ResponsiveContainer>
         </Panel>
 
-        {/* Log terminal */}
         <Panel title="Live Log" className="col-span-3" live delay={2}>
           <div className="bg-background rounded p-2 h-[350px] overflow-y-auto font-mono text-[10px] text-muted-foreground space-y-0.5">
             {Array.from({ length: 30 }, (_, i) => (
               <div key={i} className="flex gap-2">
-                <span className="text-primary/50">[{(training.step - 30 + i).toLocaleString()}]</span>
+                <span className="text-primary/50">[{(step - 30 + i).toLocaleString()}]</span>
                 <span>reward={( -5 + (i/30)*20 + Math.random()*2).toFixed(2)} loss={( 0.01 + Math.random()*0.005).toFixed(4)}</span>
               </div>
             ))}

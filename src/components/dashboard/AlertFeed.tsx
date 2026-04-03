@@ -1,4 +1,4 @@
-import { useAppStore } from "@/stores/appStore";
+import { useAlerts, useAcknowledgeAlert } from "@/hooks/useApiData";
 import { motion } from "framer-motion";
 
 const severityStyle: Record<string, string> = {
@@ -16,7 +16,11 @@ function timeAgo(ts: string) {
 }
 
 export function AlertFeed() {
-  const { alerts, acknowledgeAlert } = useAppStore();
+  const { data: alerts } = useAlerts();
+  const ackMutation = useAcknowledgeAlert();
+
+  if (!alerts) return <div className="font-mono text-xs text-muted-foreground animate-glow-pulse">AWAITING DATA...</div>;
+
   const unacked = alerts.filter((a) => !a.acknowledged).length;
 
   return (
@@ -45,7 +49,7 @@ export function AlertFeed() {
             <p className="text-foreground/80">{alert.message}</p>
             {!alert.acknowledged && (
               <button
-                onClick={() => acknowledgeAlert(alert.id)}
+                onClick={() => ackMutation.mutate(alert.id)}
                 className="mt-1 text-[10px] font-mono text-primary hover:text-primary/80 transition-colors"
               >
                 ACK →

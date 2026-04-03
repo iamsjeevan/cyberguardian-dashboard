@@ -1,9 +1,13 @@
-import { mockDrift, mockDriftHistory } from "@/lib/mock-data";
+import { useDriftCurrent, useDriftHistory } from "@/hooks/useApiData";
 import { LineChart, Line, ResponsiveContainer, ReferenceLine } from "recharts";
 import CountUp from "react-countup";
 
 export function DriftPanel() {
-  const d = mockDrift;
+  const { data: d } = useDriftCurrent();
+  const { data: history } = useDriftHistory();
+
+  if (!d) return <div className="font-mono text-xs text-muted-foreground animate-glow-pulse">AWAITING DATA...</div>;
+
   const isStable = d.status === "STABLE";
 
   return (
@@ -21,7 +25,7 @@ export function DriftPanel() {
 
       <div className="h-16">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={mockDriftHistory.slice(-30)}>
+          <LineChart data={(history ?? []).slice(-30)}>
             <Line type="monotone" dataKey="distance" stroke="#00d4ff" strokeWidth={1.5} dot={false} />
             <ReferenceLine y={0.15} stroke="#ff3366" strokeDasharray="3 3" strokeWidth={1} />
           </LineChart>
@@ -29,7 +33,7 @@ export function DriftPanel() {
       </div>
 
       <div className="text-[10px] font-mono text-muted-foreground flex justify-between">
-        <span>THRESHOLD: 0.150</span>
+        <span>THRESHOLD: {d.threshold.toFixed(3)}</span>
         <span>STEP: {d.step.toLocaleString()}</span>
       </div>
     </div>
