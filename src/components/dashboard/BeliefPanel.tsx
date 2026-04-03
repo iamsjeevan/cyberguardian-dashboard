@@ -1,4 +1,4 @@
-import { useAppStore } from "@/stores/appStore";
+import { useGameBelief } from "@/hooks/useApiData";
 import { motion } from "framer-motion";
 
 const attackerInfo: Record<string, { color: string; desc: string }> = {
@@ -8,13 +8,17 @@ const attackerInfo: Record<string, { color: string; desc: string }> = {
 };
 
 export function BeliefPanel() {
-  const belief = useAppStore((s) => s.belief);
+  const { data: belief } = useGameBelief();
+
+  if (!belief) return <div className="font-mono text-xs text-muted-foreground animate-glow-pulse">AWAITING DATA...</div>;
+
   const dominant = Object.entries(belief).sort(([, a], [, b]) => b - a)[0][0];
 
   return (
     <div className="space-y-3">
       {Object.entries(belief).map(([name, prob]) => {
         const info = attackerInfo[name];
+        if (!info) return null;
         const isDominant = name === dominant;
         return (
           <div key={name} className="space-y-1">

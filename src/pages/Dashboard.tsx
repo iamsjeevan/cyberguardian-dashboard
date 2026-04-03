@@ -9,60 +9,53 @@ import { AlertFeed } from "@/components/dashboard/AlertFeed";
 import { DriftPanel } from "@/components/dashboard/DriftPanel";
 import { ResearchMetrics } from "@/components/dashboard/ResearchMetrics";
 import { QuickActions } from "@/components/dashboard/QuickActions";
-import { useAppStore } from "@/stores/appStore";
+import { useNetworkTopology, useAlerts, useIncidents, useHealth } from "@/hooks/useApiData";
 
 export default function Dashboard() {
-  const { alerts, hosts } = useAppStore();
-  const incidents = 3;
+  const { data: topology } = useNetworkTopology();
+  const { data: alerts } = useAlerts();
+  const { data: incidents } = useIncidents();
+  const { data: health } = useHealth();
+
+  const hosts = topology?.hosts ?? [];
   const activeSessions = hosts.filter(h => h.privileged_sessions.length > 0).length;
 
   return (
     <div className="space-y-3">
-      {/* Status bar */}
       <StatusBar />
 
-      {/* Main grid */}
       <div className="grid grid-cols-12 gap-3">
-        {/* Network topology - large left */}
         <Panel title="Network Topology" className="col-span-5 row-span-2" live delay={1} glow>
           <NetworkTopologyPanel />
         </Panel>
 
-        {/* Threat gauge */}
         <Panel title="Threat Level" className="col-span-3" delay={2}>
           <ThreatGauge />
         </Panel>
 
-        {/* Alert feed - right */}
         <Panel title="Alert Feed" className="col-span-4 row-span-2" live delay={3}>
           <AlertFeed />
         </Panel>
 
-        {/* Training chart */}
         <Panel title="Live Training Metrics" className="col-span-3" live delay={4}>
           <TrainingChart />
         </Panel>
 
-        {/* CVaR */}
         <Panel title="CVaR Risk Analysis" className="col-span-4" delay={5} glow>
           <CVaRPanel />
         </Panel>
 
-        {/* Belief */}
         <Panel title="Attacker Belief State" className="col-span-4" live delay={6}>
           <BeliefPanel />
         </Panel>
 
-        {/* Drift */}
         <Panel title="Drift Detection" className="col-span-4" delay={7}>
           <DriftPanel />
         </Panel>
       </div>
 
-      {/* Research metrics strip */}
       <ResearchMetrics />
 
-      {/* Bottom row */}
       <div className="grid grid-cols-12 gap-3">
         <Panel title="Quick Actions" className="col-span-6" delay={9}>
           <QuickActions />
@@ -71,7 +64,7 @@ export default function Dashboard() {
         <Panel title="Active Stats" className="col-span-3" delay={10}>
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center">
-              <span className="font-mono text-xl font-bold text-foreground">{incidents}</span>
+              <span className="font-mono text-xl font-bold text-foreground">{incidents?.length ?? 0}</span>
               <p className="font-mono text-[9px] text-muted-foreground mt-1">INCIDENTS</p>
             </div>
             <div className="text-center">
@@ -84,8 +77,10 @@ export default function Dashboard() {
         <Panel title="System Resources" className="col-span-3" delay={11}>
           <div className="space-y-2 text-xs font-mono">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">API Latency</span>
-              <span className="text-secondary">23ms</span>
+              <span className="text-muted-foreground">API Status</span>
+              <span className={health?.status ? "text-secondary" : "text-warning"}>
+                {health?.status === "mock" ? "● MOCK" : health?.status ? "● LIVE" : "● OFFLINE"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">WS Connections</span>

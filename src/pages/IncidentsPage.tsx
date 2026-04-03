@@ -1,12 +1,7 @@
 import { Panel } from "@/components/dashboard/Panel";
 import { useState } from "react";
 import { motion } from "framer-motion";
-
-const mockIncidents = [
-  { id: "INC-001", severity: "CRITICAL", host: "User1", timestamp: "2026-04-02T10:23:00Z", status: "OPEN", message: "Active reverse shell detected, privilege escalation confirmed" },
-  { id: "INC-002", severity: "HIGH", host: "User3", timestamp: "2026-04-02T09:45:00Z", status: "INVESTIGATING", message: "Lateral movement via SMB from User3 to Enterprise0" },
-  { id: "INC-003", severity: "MEDIUM", host: "Enterprise0", timestamp: "2026-04-02T08:12:00Z", status: "RESOLVED", message: "Decoy engagement — attacker probing Enterprise0 honeypot" },
-];
+import { useIncidents } from "@/hooks/useApiData";
 
 const sevStyle: Record<string, string> = {
   CRITICAL: "bg-destructive/20 text-destructive",
@@ -20,14 +15,15 @@ const statStyle: Record<string, string> = {
 };
 
 export default function IncidentsPage() {
+  const { data: incidents } = useIncidents();
   const [selected, setSelected] = useState<string | null>(null);
-  const sel = mockIncidents.find(i => i.id === selected);
+  const sel = (incidents ?? []).find(i => i.id === selected);
 
   return (
     <div className="grid grid-cols-12 gap-4">
       <Panel title="Incident List" className="col-span-5" delay={0}>
         <div className="space-y-1.5">
-          {mockIncidents.map((inc, i) => (
+          {(incidents ?? []).map((inc, i) => (
             <motion.button
               key={inc.id}
               initial={{ opacity: 0, x: -10 }}
@@ -40,8 +36,8 @@ export default function IncidentsPage() {
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-mono text-foreground font-semibold">{inc.id}</span>
-                <span className={`status-badge ${sevStyle[inc.severity]}`}>{inc.severity}</span>
-                <span className={`ml-auto font-mono text-[10px] ${statStyle[inc.status]}`}>{inc.status}</span>
+                <span className={`status-badge ${sevStyle[inc.severity] ?? "bg-muted text-muted-foreground"}`}>{inc.severity}</span>
+                <span className={`ml-auto font-mono text-[10px] ${statStyle[inc.status] ?? "text-muted-foreground"}`}>{inc.status}</span>
               </div>
               <p className="text-muted-foreground">{inc.message}</p>
               <span className="font-mono text-[10px] text-muted-foreground mt-1 block">{inc.host} — {new Date(inc.timestamp).toLocaleString()}</span>
@@ -56,8 +52,8 @@ export default function IncidentsPage() {
             <div className="prose prose-invert prose-sm max-w-none">
               <div className="space-y-4 text-xs">
                 <div className="flex gap-3">
-                  <span className={`status-badge ${sevStyle[sel.severity]}`}>{sel.severity}</span>
-                  <span className={`font-mono ${statStyle[sel.status]}`}>{sel.status}</span>
+                  <span className={`status-badge ${sevStyle[sel.severity] ?? "bg-muted text-muted-foreground"}`}>{sel.severity}</span>
+                  <span className={`font-mono ${statStyle[sel.status] ?? "text-muted-foreground"}`}>{sel.status}</span>
                 </div>
                 <h3 className="font-display text-foreground text-sm">Incident Summary</h3>
                 <p className="text-foreground/80">{sel.message}</p>

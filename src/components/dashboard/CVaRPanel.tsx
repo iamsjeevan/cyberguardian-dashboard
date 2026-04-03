@@ -1,18 +1,20 @@
-import { mockCVaRMetrics } from "@/lib/mock-data";
+import { useCVaRMetrics } from "@/hooks/useApiData";
 import CountUp from "react-countup";
 
 export function CVaRPanel() {
-  const m = mockCVaRMetrics;
+  const { data: m } = useCVaRMetrics();
+
+  if (!m) return <div className="font-mono text-xs text-muted-foreground animate-glow-pulse">AWAITING DATA...</div>;
 
   return (
     <div className="space-y-3">
       <div className="flex items-baseline gap-2">
         <span className="font-mono text-2xl font-bold text-warning glow-text">
-          <CountUp end={m.cvar_005} decimals={2} duration={1.5} prefix="" />
+          <CountUp end={m.cvar_005} decimals={2} duration={1.5} />
         </span>
         <span className="font-mono text-[10px] text-muted-foreground">CVaR α=0.05</span>
       </div>
-      
+
       <div className="flex gap-2">
         <div className="status-badge bg-destructive/20 text-destructive">
           <CountUp end={m.catastrophic_rate * 100} decimals={1} duration={1} suffix="%" /> CATASTROPHIC

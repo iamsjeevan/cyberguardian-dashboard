@@ -1,14 +1,27 @@
 import { Play, Square, FlaskConical, RefreshCw } from "lucide-react";
+import { useStartTraining, useStopTraining, useRunEvaluation } from "@/hooks/useApiData";
 import { useAppStore } from "@/stores/appStore";
 
 export function QuickActions() {
   const { isTraining, setIsTraining } = useAppStore();
+  const startMutation = useStartTraining();
+  const stopMutation = useStopTraining();
+  const evalMutation = useRunEvaluation();
+
+  const handleStart = () => {
+    setIsTraining(true);
+    startMutation.mutate();
+  };
+  const handleStop = () => {
+    setIsTraining(false);
+    stopMutation.mutate();
+  };
 
   return (
     <div className="flex flex-wrap gap-2">
-      <ActionBtn icon={Play} label="START TRAINING" variant="primary" onClick={() => setIsTraining(true)} disabled={isTraining} />
-      <ActionBtn icon={Square} label="STOP" variant="destructive" onClick={() => setIsTraining(false)} disabled={!isTraining} />
-      <ActionBtn icon={FlaskConical} label="RUN EVALUATION" variant="default" />
+      <ActionBtn icon={Play} label="START TRAINING" variant="primary" onClick={handleStart} disabled={isTraining} />
+      <ActionBtn icon={Square} label="STOP" variant="destructive" onClick={handleStop} disabled={!isTraining} />
+      <ActionBtn icon={FlaskConical} label="RUN EVALUATION" variant="default" onClick={() => evalMutation.mutate()} />
       <ActionBtn icon={RefreshCw} label="REBUILD KG" variant="default" />
     </div>
   );

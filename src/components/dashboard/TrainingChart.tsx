@@ -1,25 +1,26 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { mockTrainingHistory } from "@/lib/mock-data";
+import { useTrainingHistory } from "@/hooks/useApiData";
 
 export function TrainingChart() {
-  const data = mockTrainingHistory.slice(-100);
+  const { data: history } = useTrainingHistory();
+  const data = (history ?? []).slice(-100);
 
   return (
     <ResponsiveContainer width="100%" height={200}>
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#0d3a5c" />
-        <XAxis 
-          dataKey="step" 
+        <XAxis
+          dataKey="step"
           tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`}
           tick={{ fontSize: 10, fill: "#3d7a9e", fontFamily: "JetBrains Mono" }}
           stroke="#0d3a5c"
         />
-        <YAxis 
+        <YAxis
           yAxisId="reward"
           tick={{ fontSize: 10, fill: "#3d7a9e", fontFamily: "JetBrains Mono" }}
           stroke="#0d3a5c"
         />
-        <YAxis 
+        <YAxis
           yAxisId="cvar"
           orientation="right"
           tick={{ fontSize: 10, fill: "#3d7a9e", fontFamily: "JetBrains Mono" }}

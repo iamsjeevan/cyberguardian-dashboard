@@ -1,15 +1,21 @@
 import { Panel } from "@/components/dashboard/Panel";
-import { mockBenchmarks } from "@/lib/mock-data";
+import { useBenchmarks, useRunEvaluation } from "@/hooks/useApiData";
 import CountUp from "react-countup";
 import { motion } from "framer-motion";
 import { FlaskConical } from "lucide-react";
 
 export default function EvaluationPage() {
+  const { data: benchmarks } = useBenchmarks();
+  const evalMutation = useRunEvaluation();
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-sm text-muted-foreground tracking-widest uppercase">Benchmark Results</h2>
-        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-primary/30 bg-primary/20 text-primary font-mono text-xs uppercase">
+        <button
+          onClick={() => evalMutation.mutate()}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-primary/30 bg-primary/20 text-primary font-mono text-xs uppercase"
+        >
           <FlaskConical size={12} /> Run Evaluation Suite
         </button>
       </div>
@@ -27,7 +33,7 @@ export default function EvaluationPage() {
               </tr>
             </thead>
             <tbody>
-              {mockBenchmarks.map((b, i) => (
+              {(benchmarks ?? []).map((b, i) => (
                 <motion.tr
                   key={b.agent}
                   initial={{ opacity: 0, x: -10 }}
@@ -67,7 +73,6 @@ export default function EvaluationPage() {
         </div>
       </Panel>
 
-      {/* Research highlight cards */}
       <div className="grid grid-cols-3 gap-4">
         <Panel title="EWC Forgetting Reduction" delay={1} glow>
           <div className="text-center py-4">
