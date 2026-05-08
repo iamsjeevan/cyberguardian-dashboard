@@ -1,4 +1,4 @@
-import type { Host, Alert, TrainingStatus, CVaRMetrics, DriftStatus, BeliefState, BenchmarkResult, ExplanationCard, DriftPoint } from "./api/client";
+import type { Host, Alert, TrainingStatus, CVaRMetrics, DriftStatus, BeliefState, BenchmarkResult, ExplanationCard, DriftPoint, GANStatus, GANPoint, GANSample } from "./api/client";
 
 export const mockHosts: Host[] = [
   { name: "User0", subnet: "10.0.1.0/24", status: "CLEAN", malicious_processes: [], privileged_sessions: [] },
@@ -89,4 +89,34 @@ export const mockTrainingHistory = Array.from({ length: 200 }, (_, i) => ({
   mean_reward: -5 + (i / 200) * 20 + (Math.random() - 0.5) * 3,
   cvar_005: -10 + (i / 200) * 8 + (Math.random() - 0.5) * 2,
   loss: 0.1 * Math.exp(-i / 50) + Math.random() * 0.005,
+}));
+
+export const mockGANStatus: GANStatus = {
+  epoch: 487,
+  generator_loss: 0.847,
+  discriminator_loss: 0.612,
+  fid_score: 14.32,
+  realism_score: 0.913,
+  samples_generated: 24817,
+  mode: "TRAINING",
+};
+
+export const mockGANHistory: GANPoint[] = Array.from({ length: 200 }, (_, i) => {
+  const t = i / 200;
+  return {
+    epoch: i * 5,
+    generator_loss: 2.4 * Math.exp(-t * 2.2) + 0.6 + (Math.random() - 0.5) * 0.25,
+    discriminator_loss: 0.3 + 0.5 * (1 - Math.exp(-t * 1.8)) + (Math.random() - 0.5) * 0.18,
+    fid: 95 * Math.exp(-t * 2.6) + 8 + (Math.random() - 0.5) * 4,
+  };
+});
+
+const sampleTypes: GANSample["type"][] = ["ATTACK_TRAFFIC", "MALWARE_PAYLOAD", "PHISHING_EMAIL", "EVASION_VARIANT"];
+export const mockGANSamples: GANSample[] = Array.from({ length: 12 }, (_, i) => ({
+  id: `gan-${1000 + i}`,
+  type: sampleTypes[i % sampleTypes.length],
+  realism: 0.55 + Math.random() * 0.44,
+  detected_by_discriminator: Math.random() > 0.62,
+  signature: `0x${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0").toUpperCase()}${Math.floor(Math.random() * 0xffff).toString(16).padStart(4, "0").toUpperCase()}`,
+  generated_at: new Date(Date.now() - i * 47_000).toISOString(),
 }));

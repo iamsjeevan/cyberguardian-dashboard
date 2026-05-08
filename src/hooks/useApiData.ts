@@ -8,6 +8,7 @@ import type {
 import {
   mockHosts, mockAlerts, mockTrainingStatus, mockCVaRMetrics, mockDrift, mockBelief,
   mockBenchmarks, mockExplanations, mockDriftHistory, mockTrainingHistory,
+  mockGANStatus, mockGANHistory, mockGANSamples,
 } from "@/lib/mock-data";
 
 /** Try API first, fall back to mock data on failure */

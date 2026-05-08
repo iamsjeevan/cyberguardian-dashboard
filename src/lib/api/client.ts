@@ -58,7 +58,39 @@ export const api = {
   override: {
     action: (data: OverrideAction) => apiFetch("/override/action", { method: "POST", body: JSON.stringify(data) }),
   },
+  gan: {
+    status: () => apiFetch<GANStatus>("/gan/status"),
+    history: () => apiFetch<GANPoint[]>("/gan/history"),
+    samples: () => apiFetch<GANSample[]>("/gan/samples"),
+    train: () => apiFetch("/gan/train", { method: "POST" }),
+  },
 };
+
+export interface GANStatus {
+  epoch: number;
+  generator_loss: number;
+  discriminator_loss: number;
+  fid_score: number;
+  realism_score: number;
+  samples_generated: number;
+  mode: "TRAINING" | "IDLE" | "GENERATING";
+}
+
+export interface GANPoint {
+  epoch: number;
+  generator_loss: number;
+  discriminator_loss: number;
+  fid: number;
+}
+
+export interface GANSample {
+  id: string;
+  type: "ATTACK_TRAFFIC" | "MALWARE_PAYLOAD" | "PHISHING_EMAIL" | "EVASION_VARIANT";
+  realism: number;
+  detected_by_discriminator: boolean;
+  signature: string;
+  generated_at: string;
+}
 
 // Types
 export interface TrainingStatus {
