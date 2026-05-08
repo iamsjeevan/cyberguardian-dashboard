@@ -11,6 +11,7 @@ import KGPage from "@/pages/KGPage";
 import GamePage from "@/pages/GamePage";
 import EvaluationPage from "@/pages/EvaluationPage";
 import IncidentsPage from "@/pages/IncidentsPage";
+import GANPage from "@/pages/GANPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/game" element={<GamePage />} />
             <Route path="/evaluation" element={<EvaluationPage />} />
             <Route path="/incidents" element={<IncidentsPage />} />
+            <Route path="/gan" element={<GANPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

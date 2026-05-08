@@ -1,6 +1,6 @@
 import { 
   LayoutDashboard, Brain, Network, MessageSquareText, 
-  GitBranch, Swords, BarChart3, FileWarning, 
+  GitBranch, Swords, BarChart3, FileWarning, Sparkles,
   ChevronLeft, ChevronRight, Wifi, WifiOff, Database
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -13,6 +13,7 @@ const navItems = [
   { path: "/explain", label: "Explanations", icon: MessageSquareText },
   { path: "/kg", label: "Knowledge Graph", icon: GitBranch },
   { path: "/game", label: "Game Theory", icon: Swords },
+  { path: "/gan", label: "GAN Adversarial", icon: Sparkles },
   { path: "/evaluation", label: "Evaluation", icon: BarChart3 },
   { path: "/incidents", label: "Incidents", icon: FileWarning },
 ];
