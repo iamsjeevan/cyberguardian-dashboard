@@ -14,9 +14,11 @@ const navItems = [
   { path: "/explain", label: "Explanations", icon: MessageSquareText },
   { path: "/kg", label: "Knowledge Graph", icon: GitBranch },
   { path: "/game", label: "Game Theory", icon: Swords },
-  { path: "/gan", label: "GAN Adversarial", icon: Sparkles },
+  { path: "/gan", label: "GAN Trainer", icon: Sparkles },
+  { path: "/scanner", label: "Network Scanner", icon: Radar },
   { path: "/evaluation", label: "Evaluation", icon: BarChart3 },
   { path: "/incidents", label: "Incidents", icon: FileWarning },
+  { path: "/logs", label: "System Logs", icon: Terminal },
 ];
 
 export function AppSidebar() {
