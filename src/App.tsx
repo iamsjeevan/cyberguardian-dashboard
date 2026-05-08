@@ -12,14 +12,23 @@ import GamePage from "@/pages/GamePage";
 import EvaluationPage from "@/pages/EvaluationPage";
 import IncidentsPage from "@/pages/IncidentsPage";
 import GANPage from "@/pages/GANPage";
+import ScannerPage from "@/pages/ScannerPage";
+import LogsPage from "@/pages/LogsPage";
 import NotFound from "@/pages/NotFound";
+import { useGlobalProcessManager } from "@/hooks/useGlobalProcessManager";
 
 const queryClient = new QueryClient();
+
+const ProcessHost = () => {
+  useGlobalProcessManager();
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Sonner />
+      <ProcessHost />
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
@@ -32,6 +41,8 @@ const App = () => (
             <Route path="/evaluation" element={<EvaluationPage />} />
             <Route path="/incidents" element={<IncidentsPage />} />
             <Route path="/gan" element={<GANPage />} />
+            <Route path="/scanner" element={<ScannerPage />} />
+            <Route path="/logs" element={<LogsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

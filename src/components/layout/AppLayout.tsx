@@ -11,6 +11,9 @@ const pageTitles: Record<string, string> = {
   "/game": "Game Theory",
   "/evaluation": "Benchmark Evaluation",
   "/incidents": "Incident Reports",
+  "/gan": "GAN Trainer",
+  "/scanner": "Network Scanner",
+  "/logs": "System Logs",
 };
 
 export function AppLayout() {
