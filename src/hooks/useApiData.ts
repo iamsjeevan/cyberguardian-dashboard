@@ -199,3 +199,18 @@ export const useOverrideAction = () =>
 // ─── Training History (mock only, no dedicated endpoint) ───
 export const useTrainingHistory = () =>
   useQuery({ queryKey: ["training", "history"], queryFn: async () => mockTrainingHistory, staleTime: Infinity });
+
+// ─── GAN (Adversarial Sample Generation) ───
+export const useGANStatus = () =>
+  useQuery({ queryKey: ["gan", "status"], queryFn: () => withFallback(api.gan.status, mockGANStatus), refetchInterval: 5000 });
+
+export const useGANHistory = () =>
+  useQuery({ queryKey: ["gan", "history"], queryFn: () => withFallback(api.gan.history, mockGANHistory) });
+
+export const useGANSamples = () =>
+  useQuery({ queryKey: ["gan", "samples"], queryFn: () => withFallback(api.gan.samples, mockGANSamples), refetchInterval: 8000 });
+
+export const useTrainGAN = () => {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: () => api.gan.train(), onSuccess: () => qc.invalidateQueries({ queryKey: ["gan"] }) });
+};
