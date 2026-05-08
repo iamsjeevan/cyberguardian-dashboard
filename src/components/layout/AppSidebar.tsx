@@ -1,6 +1,7 @@
 import { 
   LayoutDashboard, Brain, Network, MessageSquareText, 
   GitBranch, Swords, BarChart3, FileWarning, Sparkles,
+  Radar, Terminal,
   ChevronLeft, ChevronRight, Wifi, WifiOff, Database
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
